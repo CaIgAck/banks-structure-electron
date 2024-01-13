@@ -6,7 +6,7 @@ npm i
 `
 ## Запуск проекта
 `
-    cd electron_version / electron main.js
+    cd electron_version / electron ./src/main.js
 `
 
 Проект сделан, как курсовая работа с помощью технологии electron 

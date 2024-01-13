@@ -1,13 +1,12 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('path');
 
-const Bank = require('./bank');
-const Department = require('./department');
-const Employee = require('./employee');
+const Bank = require('./structure/bank');
+const Department = require('./structure/department');
+const Employee = require('./structure/employee');
 
 let mainWindow;
 
-function createWindow() {
+async function createWindow() {
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
@@ -17,7 +16,7 @@ function createWindow() {
         },
     });
 
-    mainWindow.loadFile('index.html');
+    await mainWindow.loadFile('./view/index.html');
 
     mainWindow.on('closed', function () {
         mainWindow = null;
@@ -30,8 +29,8 @@ app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') app.quit();
 });
 
-app.on('activate', function () {
-    if (mainWindow === null) createWindow();
+app.on('activate', async function () {
+    if (mainWindow === null)  await createWindow();
 });
 
 let bank;
