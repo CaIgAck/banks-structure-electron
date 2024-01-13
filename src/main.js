@@ -16,7 +16,7 @@ async function createWindow() {
         },
     });
 
-    await mainWindow.loadFile('./view/index.html');
+    await mainWindow.loadFile('./views/index.html');
 
     mainWindow.on('closed', function () {
         mainWindow = null;
