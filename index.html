@@ -1,0 +1,74 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Management Demo</title>
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+<h1>Bank Management Demo</h1>
+
+<div class="block">
+    <label for="bankNameInput">Enter Bank Name:</label>
+    <input type="text" id="bankNameInput" placeholder="Bank Name">
+    <button id="addBankButton">init bank name</button>
+</div>
+
+<div class="block">
+    <label for="departmentNameInput">Enter Department Name:</label>
+    <input type="text" id="departmentNameInput" placeholder="Department Name">
+    <button id="addDepartmentButton">Add Department</button>
+
+</div>
+<div style="display: flex; align-items: center" class="block">
+    <div style="margin-right: 10px">
+        <div>
+            <label for="lastNameInput">Enter Employee Last Name:</label>
+            <input type="text" id="lastNameInput" placeholder="Last Name">
+        </div>
+        <div style="margin-top: 10px">
+            <label for="positionInput">Enter Employee Position:</label>
+            <input type="text" id="positionInput" placeholder="Position">
+        </div>
+    </div>
+    <button id="addEmployeeButton">Add Employee</button>
+</div>
+<div class="block">
+    <button id="getBankStructureButton">Get Bank Structure</button>
+</div>
+
+<pre id="bankStructureOutput"></pre>
+
+
+<script>
+    const { ipcRenderer } = require('electron');
+
+    document.getElementById('addDepartmentButton').addEventListener('click', () => {
+        const departmentName = document.getElementById('departmentNameInput').value;
+        ipcRenderer.send('addDepartment', departmentName);
+    });
+
+    document.getElementById('addEmployeeButton').addEventListener('click', () => {
+        const lastName = document.getElementById('lastNameInput').value;
+        const position = document.getElementById('positionInput').value;
+        ipcRenderer.send('addEmployee', { lastName, position });
+    });
+
+    document.getElementById('getBankStructureButton').addEventListener('click', () => {
+        ipcRenderer.send('getBankStructure');
+    });
+
+    document.getElementById('addBankButton').addEventListener('click', () => {
+        const bankName = document.getElementById('bankNameInput').value;
+        ipcRenderer.send('initBank', {bankName});
+    });
+
+    ipcRenderer.on('bankStructure', (event, bankStructure) => {
+        document.getElementById('bankStructureOutput').innerText = JSON.stringify(bankStructure, null, 2);
+    });
+</script>
+</body>
+</html>
