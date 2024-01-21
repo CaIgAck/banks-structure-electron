@@ -1,8 +1,9 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+// main.js
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
 
-const Bank = require('./structure/bank');
-const Department = require('./structure/department');
-const Employee = require('./structure/employee');
+// main.js
+const mainWindowService = require('./services/mainWindowService');
 
 let mainWindow;
 
@@ -16,11 +17,13 @@ async function createWindow() {
         },
     });
 
-    await mainWindow.loadFile('./views/index.html');
+    await mainWindow.loadFile(path.join(__dirname, 'views', 'index.html'));
 
     mainWindow.on('closed', function () {
         mainWindow = null;
     });
+
+    mainWindowService.setMainWindow(mainWindow); // Установка mainWindow в службе
 }
 
 app.whenReady().then(createWindow);
@@ -30,26 +33,8 @@ app.on('window-all-closed', function () {
 });
 
 app.on('activate', async function () {
-    if (mainWindow === null)  await createWindow();
+    if (mainWindow === null) await createWindow();
 });
 
-let bank;
 
-ipcMain.on('addDepartment', (event, departmentName) => {
-    const department = new Department(departmentName);
-    bank.addDepartment(department);
-});
-
-ipcMain.on('addEmployee', (event, { lastName, position }) => {
-    const employee = new Employee(lastName, position);
-    const lastDepartment = bank.departmentList[bank.departmentList.length - 1];
-    lastDepartment.addEmployee(employee);
-});
-
-ipcMain.on('initBank', (event, { bankName }) => {
-    bank = new Bank(bankName);
-});
-
-ipcMain.on('getBankStructure', (event) => {
-    event.reply('bankStructure', bank);
-});
+require('./controllers/mainController');

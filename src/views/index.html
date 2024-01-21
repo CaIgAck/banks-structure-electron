@@ -37,6 +37,12 @@
 <div class="block">
     <button id="getBankStructureButton">Get Bank Structure</button>
 </div>
+<div class="block">
+    <button id="loadDataButton">Load Data</button>
+</div>
+<div class="block">
+    <button id="saveDataButton">Save Data</button>
+</div>
 
 <pre id="bankStructureOutput"></pre>
 
@@ -64,9 +70,22 @@
         ipcRenderer.send('initBank', {bankName});
     });
 
+    document.getElementById('loadDataButton').addEventListener('click', () => {
+        ipcRenderer.send('loadData');
+    });
+
+    document.getElementById('saveDataButton').addEventListener('click', () => {
+        ipcRenderer.send('saveData');
+    });
+
+    ipcRenderer.on('enableSaveButton', () => {
+        document.getElementById('saveDataButton').disabled = false;
+    });
+
     ipcRenderer.on('bankStructure', (event, bankStructure) => {
         document.getElementById('bankStructureOutput').innerText = JSON.stringify(bankStructure, null, 2);
     });
+
 </script>
 </body>
 </html>
