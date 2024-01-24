@@ -15,10 +15,35 @@ ipcMain.on('addDepartment', (event, departmentName) => {
     bank.addDepartment(department);
 });
 
+ipcMain.on('removeDepartment', (event, departmentName) => {
+    const removedDepartment = bank.removeDepartmentByName(departmentName);
+    if (removedDepartment) {
+        console.log(`Department "${departmentName}" removed.`);
+    } else {
+        console.log(`Department "${departmentName}" not found.`);
+    }
+});
+
+ipcMain.on('findDepartment', (event, departmentName) => {
+    const foundDepartment = bank.findDepartmentByName(departmentName);
+    const mainWindow = getMainWindow();
+
+    if (mainWindow) {
+        mainWindow.webContents.send('bankStructure', foundDepartment);
+    } else {
+        console.error('Main window is not initialized.');
+    }
+});
+
 ipcMain.on('addEmployee', (event, { lastName, position }) => {
     const employee = new Employee(lastName, position);
-    const lastDepartment = bank.departmentList[bank.departmentList.length - 1];
-    lastDepartment.addEmployee(employee);
+    const lastDepartment = bank.departmentList.removeNode(); // Извлекаем последний отдел
+    if (lastDepartment) {
+        lastDepartment.addEmployee(employee);
+        bank.departmentList.addNode(lastDepartment); // Помещаем обратно в конец списка
+    } else {
+        console.error('No department available.');
+    }
 });
 
 ipcMain.on('initBank', (event, { bankName }) => {

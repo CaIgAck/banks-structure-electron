@@ -1,18 +1,20 @@
 // department.js
+const LinkedList = require('./linkedList');
 
 class Department {
     constructor(departmentName) {
         this.departmentName = departmentName;
-        this.employeeList = [];
+        this.employeeList = new LinkedList();
     }
 
     addEmployee(employee) {
-        this.employeeList.push(employee);
+        this.employeeList.addNode(employee);
     }
 
     extractEmployee() {
-        return this.employeeList.length > 0 ? this.employeeList.shift() : null;
+        return this.employeeList.removeNode();
     }
+
 }
 
 module.exports = Department;

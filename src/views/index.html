@@ -16,9 +16,23 @@
 </div>
 
 <div class="block">
-    <label for="departmentNameInput">Enter Department Name:</label>
-    <input type="text" id="departmentNameInput" placeholder="Department Name">
-    <button id="addDepartmentButton">Add Department</button>
+    <div style="margin-bottom: 10px;">
+        <label for="departmentNameInput">Enter Department Name:</label>
+        <input type="text" id="departmentNameInput" placeholder="Department Name">
+        <button id="addDepartmentButton">Add Department</button>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label for="departmentDeleteByName">Enter Department Name:</label>
+        <input type="text" id="departmentDeleteByName" placeholder="Department Name">
+        <button id="departmentDeleteByNameButton">delete Department</button>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label for="departmentFindByName">Enter Department Name:</label>
+        <input type="text" id="departmentFindByName" placeholder="Department Name">
+        <button id="findByNameDepartmentButton">find Department</button>
+    </div>
 
 </div>
 <div style="display: flex; align-items: center" class="block">
@@ -47,12 +61,21 @@
 <pre id="bankStructureOutput"></pre>
 
 
+
 <script>
     const { ipcRenderer } = require('electron');
 
     document.getElementById('addDepartmentButton').addEventListener('click', () => {
         const departmentName = document.getElementById('departmentNameInput').value;
         ipcRenderer.send('addDepartment', departmentName);
+    });
+    document.getElementById('departmentDeleteByNameButton').addEventListener('click', () => {
+        const departmentName = document.getElementById('departmentDeleteByName').value;
+        ipcRenderer.send('removeDepartment', departmentName);
+    });
+    document.getElementById('findByNameDepartmentButton').addEventListener('click', () => {
+        const departmentName = document.getElementById('departmentFindByName').value;
+        ipcRenderer.send('findDepartment', departmentName);
     });
 
     document.getElementById('addEmployeeButton').addEventListener('click', () => {
@@ -83,7 +106,42 @@
     });
 
     ipcRenderer.on('bankStructure', (event, bankStructure) => {
-        document.getElementById('bankStructureOutput').innerText = JSON.stringify(bankStructure, null, 2);
+        function convertStructureToHTML(structure) {
+            if (!structure || typeof structure !== 'object') {
+                return '';
+            }
+
+            let htmlResult = `<strong>${structure.bankName}</strong><ul>`;
+
+            if (structure.departmentList && structure.departmentList.head) {
+                let current = structure.departmentList.head;
+
+                while (current) {
+                    const department = current.data;
+                    htmlResult += `<li>${department.departmentName}`;
+
+                    if (department.employeeList && department.employeeList.head) {
+                        htmlResult += '<ul>';
+                        let employeeNode = department.employeeList.head;
+
+                        while (employeeNode) {
+                            const employee = employeeNode.data;
+                            htmlResult += `<li>${employee.lastName} - ${employee.position}</li>`;
+                            employeeNode = employeeNode.next;
+                        }
+                        htmlResult += '</ul>';
+                    }
+
+                    htmlResult += '</li>';
+                    current = current.next;
+                }
+            }
+
+            htmlResult += '</ul>';
+            return htmlResult;
+        }
+
+        document.getElementById('bankStructureOutput').innerHTML = convertStructureToHTML(bankStructure);
     });
 
 </script>
